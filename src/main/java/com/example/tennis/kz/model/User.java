@@ -39,6 +39,8 @@ public class User implements UserDetails {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name = "description")
+    private String description;
 
 
     @JsonIgnore
