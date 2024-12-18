@@ -2,9 +2,11 @@ com\example\tennis\kz\controller\AuthenticationController.class
 com\example\tennis\kz\controller\UserController.class
 com\example\tennis\kz\service\EmailService.class
 com\example\tennis\kz\model\RefreshToken.class
+com\example\tennis\kz\model\Tournament.class
 com\example\tennis\kz\service\UserService.class
 com\example\tennis\kz\model\ConfirmationToken$ConfirmationTokenBuilder.class
 com\example\tennis\kz\model\request\SignInRequest.class
+com\example\tennis\kz\model\Tournament$TournamentBuilder.class
 com\example\tennis\kz\model\User.class
 com\example\tennis\kz\service\ConfirmationTokenService.class
 com\example\tennis\kz\service\AuthenticationService.class

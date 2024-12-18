@@ -10,6 +10,7 @@ C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\r
 C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\request\SignUpRequest.java
 C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\response\ApiError.java
 C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\response\JwtAuthenticationResponse.java
+C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\Tournament.java
 C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\User.java
 C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\model\UserInfo.java
 C:\Users\Asus\IdeaProjects\tennis.kz\src\main\java\com\example\tennis\kz\repository\ConfirmationTokenRepository.java
