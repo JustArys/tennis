@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -21,5 +24,10 @@ public class Tournament {
 
     private String description;
 
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalTime startTime;
+
+    private String location;
 
 }
