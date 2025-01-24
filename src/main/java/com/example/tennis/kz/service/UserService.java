@@ -67,4 +67,8 @@ public class UserService {
         return userRepository.findUserByEmail(email).orElseThrow(()
                 -> new NoSuchElementException(String.format("User with email '%d' not found", email)));
     }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }

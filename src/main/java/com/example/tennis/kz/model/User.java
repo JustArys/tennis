@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data
@@ -27,7 +28,7 @@ public class User implements UserDetails {
     private String email;
 
     @JsonIgnore
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @MapsId
@@ -35,6 +36,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "user_id")
     private UserInfo userInfo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
 
     @Column(name = "enabled")
     private boolean enabled;
@@ -46,7 +50,7 @@ public class User implements UserDetails {
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(() -> "ROLE_"+ role.name());
     }
 
     @JsonIgnore

@@ -23,7 +23,6 @@ public class UserInfo {
     private Gender gender;
     private String firstName;
     private String lastName;
-
     private String phone;
     private Float rating;
 }

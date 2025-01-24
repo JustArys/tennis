@@ -28,6 +28,7 @@ public class Tournament {
     private LocalDate endDate;
     private LocalTime startTime;
 
+
     private String location;
 
 }

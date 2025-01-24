@@ -21,7 +21,7 @@ public class UserController {
     }
     @GetMapping("/authenticated")
     public ResponseEntity<?> getAuthenticatedUserId() {
-        return ResponseEntity.ok(userService.getAuthenticatedUser().getId());
+        return ResponseEntity.ok(userService.getAuthenticatedUser());
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> getUser(@PathVariable Long id) {

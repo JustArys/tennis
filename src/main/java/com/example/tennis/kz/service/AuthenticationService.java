@@ -1,5 +1,6 @@
 package com.example.tennis.kz.service;
 
+import com.example.tennis.kz.model.Role;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.UserInfo;
 import com.example.tennis.kz.model.request.SignInRequest;
@@ -26,11 +27,28 @@ public class AuthenticationService{
     private final RefreshTokenRepository refreshTokenRepository;
 
     public JwtAuthenticationResponse signup(SignUpRequest request) {
+
+        if (userService.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        // Assign default role
+
+        // Create user
         var user = User.builder()
-                .userInfo(UserInfo.builder().firstName(request.getFirstName()).lastName(request.getLastName()).build())
-                .email(request.getEmail()).password(passwordEncoder.encode(request.getPassword()))
+                .userInfo(UserInfo.builder()
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .build())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .enabled(true)
                 .build();
+
         userService.saveUser(user);
+
+        // Generate tokens
         return JwtAuthenticationResponse.builder()
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(jwtService.generateRefreshToken(user).getRefreshToken())
