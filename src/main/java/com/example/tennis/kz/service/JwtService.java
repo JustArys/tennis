@@ -33,7 +33,7 @@ public class JwtService {
     }
 
     public String generateAccessToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, 1000 * 60 * 10);
+        return generateToken(new HashMap<>(), userDetails, 10000 * 60 * 10);
     }
 
     public RefreshToken generateRefreshToken(UserDetails userDetails) {
