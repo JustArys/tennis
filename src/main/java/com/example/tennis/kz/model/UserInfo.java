@@ -20,6 +20,7 @@ public class UserInfo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     private String firstName;
     private String lastName;

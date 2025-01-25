@@ -4,6 +4,4 @@ public enum Category {
     Singles,
     Doubles,
     Mixed,
-    Men,
-    Woman
 }
