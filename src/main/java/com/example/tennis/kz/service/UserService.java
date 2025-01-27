@@ -3,7 +3,10 @@ package com.example.tennis.kz.service;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.UserInfo;
 import com.example.tennis.kz.repository.ConfirmationTokenRepository;
+import com.example.tennis.kz.repository.RefreshTokenRepository;
+import com.example.tennis.kz.repository.UserInfoRepository;
 import com.example.tennis.kz.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.NonUniqueObjectException;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +22,11 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final ConfirmationTokenService confirmationTokenService;
-
+    private final UserInfoRepository userInfoRepository;
 
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findUserByEmail(username)
@@ -70,5 +73,17 @@ public class UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Transactional
+    public void deleteUsers() {
+        confirmationTokenRepository.deleteAll();
+        refreshTokenRepository.deleteAll();
+        userRepository.deleteAll();
+        userInfoRepository.deleteAll();
     }
 }
