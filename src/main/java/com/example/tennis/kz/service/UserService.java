@@ -1,5 +1,6 @@
 package com.example.tennis.kz.service;
 
+import com.example.tennis.kz.model.Role;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.UserInfo;
 import com.example.tennis.kz.repository.ConfirmationTokenRepository;
@@ -71,6 +72,10 @@ public class UserService {
                 -> new NoSuchElementException(String.format("User with email '%d' not found", email)));
     }
 
+    public User updateUserRole(User user, Role role){
+        user.setRole(role);
+        return userRepository.save(user);
+    }
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }

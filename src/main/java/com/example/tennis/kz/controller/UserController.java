@@ -1,5 +1,6 @@
 package com.example.tennis.kz.controller;
 
+import com.example.tennis.kz.model.Role;
 import com.example.tennis.kz.model.UserInfo;
 import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,11 @@ public class UserController {
     @RequestMapping(value = "/confirmemail", method = {RequestMethod.GET, RequestMethod.POST})
     private ResponseEntity<?> confirmEmail(@RequestParam("token") String token) {
         return userService.confirmEmail(token);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<?> updateRole(@RequestBody Role role) {
+        return ResponseEntity.ok(userService.updateUserRole(userService.getAuthenticatedUser(), role));
     }
 
     @GetMapping("/all")

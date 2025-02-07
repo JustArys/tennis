@@ -29,10 +29,19 @@ public class Tournament {
 
     private String description;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private LocalDate startDate;
+
+    @JsonFormat(pattern="yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private LocalDate endDate;
+
     @JsonFormat(pattern = "HH:mm")
+    @Temporal(TemporalType.TIME)
     private LocalTime startTime;
+
+
     @ElementCollection(targetClass = Category.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
