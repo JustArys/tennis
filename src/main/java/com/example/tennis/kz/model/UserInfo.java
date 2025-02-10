@@ -26,4 +26,5 @@ public class UserInfo {
     private String lastName;
     private String phone;
     private Float rating;
+    private Integer age;
 }

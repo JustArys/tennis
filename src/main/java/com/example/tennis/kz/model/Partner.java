@@ -1,6 +1,6 @@
 package com.example.tennis.kz.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,34 +10,29 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table
-@Builder
-public class Coach {
+public class Partner {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @Column(name = "coach_id")
+    @Column(name = "partner_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private UserInfo user;
-
+    private String phone;
+    private String firstName;
+    private String lastName;
+    private Float rating;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean enabled;
     private String city;
-    private String language;
-    private Float cost;
-    private String service;
-    private String description;
-    private Integer experience;
     private String stadium;
-
+    private String description;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
 }

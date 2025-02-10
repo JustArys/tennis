@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,7 @@ public class AuthenticationService{
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .createdAt(LocalDateTime.now())
                 .enabled(true)
                 .build();
 

@@ -7,6 +7,7 @@ import com.example.tennis.kz.repository.CoachRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -42,6 +43,7 @@ public class CoachService {
                 .experience(coach.getExperience())
                 .stadium(coach.getStadium())
                 .user(user.getUserInfo())
+                .createdAt(LocalDateTime.now())
                 .build();
         return coachRepository.save(newCoach);
     }

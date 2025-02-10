@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,8 +44,8 @@ public class User implements UserDetails {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
 
     @JsonIgnore

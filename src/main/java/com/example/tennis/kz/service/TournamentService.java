@@ -18,9 +18,10 @@ public class TournamentService {
     }
 
     public Tournament getTournamentById(Long id) {
-        return tournamentRepository.findById(id).orElseThrow(()
-                -> new NoSuchElementException(String.format("No tournament found with '%d'", id)));
+        return tournamentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No tournament found with id " + id));
     }
+
     public Tournament createTournament(Tournament tournament) {
         return tournamentRepository.save(tournament);
     }
@@ -37,11 +38,15 @@ public class TournamentService {
             tournament.setMaxLevel(tournamentDetails.getMaxLevel());
             tournament.setCost(tournamentDetails.getCost());
             return tournamentRepository.save(tournament);
-        }).orElseThrow(() -> new RuntimeException("Tournament not found with id " + id));
+        }).orElseThrow(() -> new NoSuchElementException("Tournament not found with id " + id));
     }
 
+
     public void deleteTournament(Long id) {
-        tournamentRepository.deleteById(id);
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No tournament found with id " + id));
+        tournamentRepository.delete(tournament);
     }
+
 
 }
