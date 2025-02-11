@@ -3,6 +3,9 @@ package com.example.tennis.kz.service;
 import com.example.tennis.kz.model.Tournament;
 import com.example.tennis.kz.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +23,11 @@ public class TournamentService {
     public Tournament getTournamentById(Long id) {
         return tournamentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No tournament found with id " + id));
+    }
+
+    public Page<Tournament> findAllTournaments(int page) {
+        Pageable pageable = PageRequest.of(page,10);
+        return tournamentRepository.findAll(pageable);
     }
 
     public Tournament createTournament(Tournament tournament) {

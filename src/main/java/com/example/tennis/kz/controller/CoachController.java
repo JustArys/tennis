@@ -21,12 +21,22 @@ public class CoachController {
         return ResponseEntity.ok(coachService.getAllCoaches(enabled));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> findAllCoaches() {
+        return ResponseEntity.ok(coachService.getAllCoaches());
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<?> findAllCoaches(@RequestParam(defaultValue = "0") int page){
+        return ResponseEntity.ok(coachService.getAllCoaches(page));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findCoachById(@PathVariable Long id) {
         return ResponseEntity.ok(coachService.getCoachById(id));
     }
 
-    @PutMapping("enable/{id}")
+    @PatchMapping("enable/{id}")
     public ResponseEntity<?> enableCoach(@PathVariable Long id ) {
         return ResponseEntity.ok(coachService.enableCoach(id));
     }

@@ -35,6 +35,11 @@ public class TournamentController {
         return tournamentService.createTournament(tournament);
     }
 
+    @GetMapping("/page")
+    public ResponseEntity<?> findTournamentByPage(@RequestParam(defaultValue = "0") int page) {
+        return ResponseEntity.ok(tournamentService.findAllTournaments(page));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);

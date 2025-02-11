@@ -45,6 +45,10 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
+    @GetMapping("/page")
+    private ResponseEntity<?> getAllUsersPagination(@RequestParam(defaultValue = "0") int page){
+        return ResponseEntity.ok(userService.findAllUsers(page));
+    }
     @DeleteMapping("/all")
     public ResponseEntity<String> deleteAllUsers() {
         try {

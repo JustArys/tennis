@@ -18,6 +18,15 @@ public class PartnerController {
         return ResponseEntity.ok(partnerService.getAllPartners(enabled));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> findAllPartner() {
+        return ResponseEntity.ok(partnerService.getAllPartners());
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<?> findAllPartner(@RequestParam(defaultValue = "0") int page){
+        return ResponseEntity.ok(partnerService.getPartners(page));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<?> findPartner(@PathVariable Long id) {
         return ResponseEntity.ok(partnerService.getPartnerById(id));

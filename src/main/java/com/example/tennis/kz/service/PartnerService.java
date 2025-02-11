@@ -2,8 +2,10 @@ package com.example.tennis.kz.service;
 
 import com.example.tennis.kz.model.Partner;
 import com.example.tennis.kz.repository.PartnerRepository;
-import jakarta.mail.Part;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +26,14 @@ public class PartnerService {
                 -> new NoSuchElementException(String.format("No Partner found with '%d'", id)));
     }
 
+    public List<Partner> getAllPartners() {
+        return partnerRepository.findAll();
+    }
+
+    public Page<Partner> getPartners(int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return partnerRepository.findAll(pageable);
+    }
     public Partner enablePartner(Long id) {
         Partner partner = getPartnerById(id);
         partner.setEnabled(true);

@@ -5,6 +5,9 @@ import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.request.CoachRequest;
 import com.example.tennis.kz.repository.CoachRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +28,13 @@ public class CoachService {
         return coachRepository.findByEnabledOrderByCostAsc(enabled);
     }
 
-
+    public List<Coach> getAllCoaches() {
+        return coachRepository.findAll();
+    }
+    public Page<Coach> getAllCoaches(int page){
+        Pageable pageable = PageRequest.of(page, 10);
+        return coachRepository.findAll(pageable);
+    }
     public Coach enableCoach(Long id){
         Coach coach = getCoachById(id);
         coach.setEnabled(true);
