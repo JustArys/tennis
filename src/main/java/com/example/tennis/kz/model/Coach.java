@@ -30,7 +30,8 @@ public class Coach {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean enabled;
-    private String city;
+    @Enumerated(EnumType.STRING)
+    private City city;
     private String language;
     private Float cost;
     private String service;

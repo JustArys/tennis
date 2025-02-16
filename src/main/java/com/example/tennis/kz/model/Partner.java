@@ -31,7 +31,8 @@ public class Partner {
     private Float rating;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Boolean enabled;
-    private String city;
+    @Enumerated(EnumType.STRING)
+    private City city;
     private String stadium;
     private String description;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

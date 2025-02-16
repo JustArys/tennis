@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -48,10 +50,14 @@ public class Tournament {
     private Category category;
     private int maxParticipants;
     private String location;
-    private String city;
+    @Enumerated(EnumType.STRING)
+    private City city;
     private float minLevel;
     private float maxLevel;
     private int cost;
+    @JsonIgnore
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TournamentRegistration> registrations = new ArrayList<>();
 /*
     @JsonIgnore
     @OneToMany
