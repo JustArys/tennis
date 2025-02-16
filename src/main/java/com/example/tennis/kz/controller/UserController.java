@@ -2,6 +2,7 @@ package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.Role;
 import com.example.tennis.kz.model.UserInfo;
+import com.example.tennis.kz.service.TournamentRegistrationService;
 import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final TournamentRegistrationService registrationService;
 
 
     @PutMapping("/update")
@@ -40,6 +42,16 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserRole(userService.getAuthenticatedUser(), role));
     }
 
+    @GetMapping("/invintations")
+    public ResponseEntity<?> getInvitations() {
+        return ResponseEntity.ok(userService.findAllRegistrations(userService.getAuthenticatedUser()));
+    }
+
+    @GetMapping("/tournament")
+    public ResponseEntity<?> getTournament() {
+        return ResponseEntity.ok(userService.findAllTournaments(userService.getAuthenticatedUser()));
+    }
+
     @GetMapping("/all")
     private ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.findAllUsers());
@@ -59,5 +71,6 @@ public class UserController {
                     .body("Failed to delete users: " + e.getMessage());
         }
     }
+
 
 }

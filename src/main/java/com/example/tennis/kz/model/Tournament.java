@@ -43,10 +43,10 @@ public class Tournament {
     private LocalTime startTime;
 
 
-    @ElementCollection(targetClass = Category.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    private Set<Category> categories = new HashSet<>();
+    private Category category;
+    private int maxParticipants;
     private String location;
     private String city;
     private float minLevel;

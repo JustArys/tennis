@@ -1,12 +1,7 @@
 package com.example.tennis.kz.service;
 
-import com.example.tennis.kz.model.Role;
-import com.example.tennis.kz.model.User;
-import com.example.tennis.kz.model.UserInfo;
-import com.example.tennis.kz.repository.ConfirmationTokenRepository;
-import com.example.tennis.kz.repository.RefreshTokenRepository;
-import com.example.tennis.kz.repository.UserInfoRepository;
-import com.example.tennis.kz.repository.UserRepository;
+import com.example.tennis.kz.model.*;
+import com.example.tennis.kz.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.NonUniqueObjectException;
@@ -19,8 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.NoSuchElementException;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +26,7 @@ public class UserService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final ConfirmationTokenService confirmationTokenService;
     private final UserInfoRepository userInfoRepository;
+    private final TournamentRegistrationRepository registrationRepository;
 
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findUserByEmail(username)
@@ -85,6 +81,31 @@ public class UserService {
 
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    public List<TournamentRegistration> findAllRegistrations(User user) {
+        return registrationRepository.findByPartnerIdAndStatus(user.getId(), RegistrationStatus.PENDING_PARTNER);
+    }
+
+    public List<Tournament> findAllTournaments(User user) {
+        // Скажем, хотим видеть только зарегистрированные и ожидающие подтверждения
+        List<RegistrationStatus> allowed = List.of(RegistrationStatus.REGISTERED, RegistrationStatus.PENDING_PARTNER);
+
+        // Запрос к БД: выдаст только нужные записи
+        List<TournamentRegistration> registrations =
+                registrationRepository.findByUserIdOrPartnerIdAndStatusIn(
+                        user.getId(),
+                        user.getId(),
+                        allowed
+                );
+
+        // Собираем уникальные турниры в Set
+        Set<Tournament> tournaments = new HashSet<>();
+        for (TournamentRegistration reg : registrations) {
+            // Если в БД уже фильтруются статусы, дальше можно не проверять
+            tournaments.add(reg.getTournament());
+        }
+        return new ArrayList<>(tournaments);
     }
 
     public Page<User> findAllUsers(int page) {

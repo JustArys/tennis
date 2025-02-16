@@ -35,6 +35,11 @@ public class TournamentController {
         return tournamentService.createTournament(tournament);
     }
 
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<?> getAllParticipants(@PathVariable Long id) {
+        return ResponseEntity.ok(tournamentService.getAllParticipants(id));
+    }
+
     @GetMapping("/page")
     public ResponseEntity<?> findTournamentByPage(@RequestParam(defaultValue = "0") int page) {
         return ResponseEntity.ok(tournamentService.findAllTournaments(page));

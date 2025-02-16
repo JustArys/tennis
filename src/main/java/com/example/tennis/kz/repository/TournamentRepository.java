@@ -13,6 +13,6 @@ import java.util.Set;
 
 @Repository
 public interface TournamentRepository extends JpaRepository<Tournament, Long> {
-    List<Tournament> findByCategories(Set<Category> categories);
+    List<Tournament> findByCategory(Category category);
     Page<Tournament> findAllBy(Pageable pageable);
 }
