@@ -48,6 +48,6 @@ public class TournamentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
