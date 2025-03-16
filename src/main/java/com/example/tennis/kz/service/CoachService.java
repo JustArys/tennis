@@ -1,5 +1,6 @@
 package com.example.tennis.kz.service;
 
+import com.example.tennis.kz.model.City;
 import com.example.tennis.kz.model.Coach;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.request.CoachRequest;
@@ -57,18 +58,41 @@ public class CoachService {
         return coachRepository.save(newCoach);
     }
 
-    public Coach updateCoach(Long id,CoachRequest coach) {
-        return coachRepository.findById(id).map(coachNew -> {
-            coachNew.setCity(coach.getCity());
-            coachNew.setDescription(coach.getDescription());
-            coachNew.setService(coach.getService());
-            coachNew.setCost(coach.getCost());
-            coachNew.setEnabled(true);
-            coachNew.setLanguage(coach.getLanguage());
-            coachNew.setStadium(coach.getStadium());
-            coachNew.setExperience(coach.getExperience());
-            return coachRepository.save(coachNew);
-        }).orElseThrow(() -> new NoSuchElementException(String.format("No Coach found with '%d'", id)));
+    public Coach updateCoachParams(Long id,
+                                   City city,
+                                   String language,
+                                   Float cost,
+                                   String service,
+                                   String description,
+                                   Integer experience,
+                                   String stadium) {
+        Coach coach = coachRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Coach not found with id " + id));
+
+        if (city != null) {
+            coach.setCity(city);
+        }
+        if (language != null) {
+            coach.setLanguage(language);
+        }
+        if (cost != null) {
+            coach.setCost(cost);
+        }
+        if (service != null) {
+            coach.setService(service);
+        }
+        if (description != null) {
+            coach.setDescription(description);
+        }
+        if (experience != null) {
+            coach.setExperience(experience);
+        }
+        if (stadium != null) {
+            coach.setStadium(stadium);
+        }
+        coach.setUpdatedAt(LocalDateTime.now());
+
+        return coachRepository.save(coach);
     }
 
     public void deleteCoach(Long id) {

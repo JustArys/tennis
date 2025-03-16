@@ -1,5 +1,6 @@
 package com.example.tennis.kz.service;
 
+import com.example.tennis.kz.model.City;
 import com.example.tennis.kz.model.Partner;
 import com.example.tennis.kz.repository.PartnerRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,21 +56,45 @@ public class PartnerService {
         return partnerRepository.save(newPartner);
     }
 
-    public Partner updatePartner(Long id, Partner partner) {
-        return partnerRepository.findById(id).map(partnerNew ->
-        {
-            partnerNew.setPhone(partner.getPhone());
-            partnerNew.setFirstName(partner.getFirstName());
-            partnerNew.setLastName(partner.getLastName());
-            partnerNew.setRating(partner.getRating());
-            partnerNew.setCity(partner.getCity());
-            partnerNew.setStadium(partner.getStadium());
-            partnerNew.setDescription(partner.getDescription());
-            partnerNew.setEnabled(partner.getEnabled());
-            return partnerRepository.save(partnerNew);
-        }).orElseThrow(() -> new NoSuchElementException(String.format("No Partner found with '%d'", id)));
-    }
+    public Partner updatePartnerParams(
+            Long id,
+            String phone,
+            String firstName,
+            String lastName,
+            Float rating,
+            City city,
+            String stadium,
+            String description) {
 
+        Partner partner = partnerRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Partner not found with id " + id));
+
+        if (phone != null) {
+            partner.setPhone(phone);
+        }
+        if (firstName != null) {
+            partner.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            partner.setLastName(lastName);
+        }
+        if (rating != null) {
+            partner.setRating(rating);
+        }
+        if (city != null) {
+            partner.setCity(city);
+        }
+        if (stadium != null) {
+            partner.setStadium(stadium);
+        }
+        if (description != null) {
+            partner.setDescription(description);
+        }
+        // Update the updatedAt field to the current time
+        partner.setUpdatedAt(LocalDateTime.now());
+
+        return partnerRepository.save(partner);
+    }
     public void deletePartner(Long id) {
         partnerRepository.deleteById(id);
     }

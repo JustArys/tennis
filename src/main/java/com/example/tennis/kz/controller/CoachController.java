@@ -1,5 +1,6 @@
 package com.example.tennis.kz.controller;
 
+import com.example.tennis.kz.model.City;
 import com.example.tennis.kz.model.Coach;
 import com.example.tennis.kz.model.request.CoachRequest;
 import com.example.tennis.kz.service.CoachService;
@@ -47,8 +48,20 @@ public class CoachController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCoach(@PathVariable Long id, @RequestBody CoachRequest coach) {
-        return ResponseEntity.ok(coachService.updateCoach(id, coach));
+    public ResponseEntity<?> updateCoach(
+            @PathVariable Long id,
+            @RequestParam(required = false) City city,
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) Float cost,
+            @RequestParam(required = false) String service,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer experience,
+            @RequestParam(required = false) String stadium) {
+
+        Coach updatedCoach = coachService.updateCoachParams(
+                id, city, language, cost, service, description, experience, stadium
+        );
+        return ResponseEntity.ok(updatedCoach);
     }
 
     @DeleteMapping("/{id}")

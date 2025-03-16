@@ -1,9 +1,6 @@
 package com.example.tennis.kz.service;
 
-import com.example.tennis.kz.model.RegistrationStatus;
-import com.example.tennis.kz.model.Tournament;
-import com.example.tennis.kz.model.TournamentRegistration;
-import com.example.tennis.kz.model.User;
+import com.example.tennis.kz.model.*;
 import com.example.tennis.kz.repository.TournamentRegistrationRepository;
 import com.example.tennis.kz.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -38,21 +37,56 @@ public class TournamentService {
         return tournamentRepository.save(tournament);
     }
 
-    public Tournament updateTournament(Long id, Tournament tournamentDetails) {
-        return tournamentRepository.findById(id).map(tournament -> {
-            tournament.setDescription(tournamentDetails.getDescription());
-            tournament.setStartDate(tournamentDetails.getStartDate());
-            tournament.setEndDate(tournamentDetails.getEndDate());
-            tournament.setStartTime(tournamentDetails.getStartTime());
-            tournament.setCategory(tournament.getCategory());
-            tournament.setMaxParticipants(tournamentDetails.getMaxParticipants());
-            tournament.setLocation(tournamentDetails.getLocation());
-            tournament.setMinLevel(tournamentDetails.getMinLevel());
-            tournament.setMaxLevel(tournamentDetails.getMaxLevel());
-            tournament.setCost(tournamentDetails.getCost());
-            return tournamentRepository.save(tournament);
-        }).orElseThrow(() -> new NoSuchElementException("Tournament not found with id " + id));
+    public Tournament updateTournamentParams(
+            Long id,
+            String description,
+            LocalDate startDate,
+            LocalDate endDate,
+            LocalTime startTime,
+            Category category,
+            Integer maxParticipants,
+            String location,
+            Float minLevel,
+            Float maxLevel,
+            Integer cost) {
+
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Tournament not found with id " + id));
+
+        if (description != null) {
+            tournament.setDescription(description);
+        }
+        if (startDate != null) {
+            tournament.setStartDate(startDate);
+        }
+        if (endDate != null) {
+            tournament.setEndDate(endDate);
+        }
+        if (startTime != null) {
+            tournament.setStartTime(startTime);
+        }
+        if (category != null) {
+            tournament.setCategory(category);
+        }
+        if (maxParticipants != null) {
+            tournament.setMaxParticipants(maxParticipants);
+        }
+        if (location != null) {
+            tournament.setLocation(location);
+        }
+        if (minLevel != null) {
+            tournament.setMinLevel(minLevel);
+        }
+        if (maxLevel != null) {
+            tournament.setMaxLevel(maxLevel);
+        }
+        if (cost != null) {
+            tournament.setCost(cost);
+        }
+
+        return tournamentRepository.save(tournament);
     }
+
 
     public Set<List<User>> getAllParticipants(Long id) {
         var tournament = getTournamentById(id);

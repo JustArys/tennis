@@ -33,9 +33,6 @@ public class AuthenticationService{
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // Assign default role
-
-        // Create user
         var user = User.builder()
                 .userInfo(UserInfo.builder()
                         .firstName(request.getFirstName())

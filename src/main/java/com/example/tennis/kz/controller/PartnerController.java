@@ -1,5 +1,6 @@
 package com.example.tennis.kz.controller;
 
+import com.example.tennis.kz.model.City;
 import com.example.tennis.kz.model.Partner;
 import com.example.tennis.kz.service.PartnerService;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,20 @@ public class PartnerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePartner(@PathVariable Long id, @RequestBody Partner partner) {
-        return ResponseEntity.ok(partnerService.updatePartner(id, partner));
+    public ResponseEntity<?> updatePartner(
+            @PathVariable Long id,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) Float rating,
+            @RequestParam(required = false) City city,
+            @RequestParam(required = false) String stadium,
+            @RequestParam(required = false) String description) {
+
+        Partner updatedPartner = partnerService.updatePartnerParams(
+                id, phone, firstName, lastName, rating, city, stadium, description
+        );
+        return ResponseEntity.ok(updatedPartner);
     }
 
     @DeleteMapping("/{id}")

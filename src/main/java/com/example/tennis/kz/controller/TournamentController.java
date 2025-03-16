@@ -1,11 +1,16 @@
 package com.example.tennis.kz.controller;
 
+import com.example.tennis.kz.model.Category;
 import com.example.tennis.kz.model.Tournament;
 import com.example.tennis.kz.service.TournamentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -25,9 +30,28 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.getTournamentById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTournament(@PathVariable Long id, @RequestBody Tournament tournament) {
-        return ResponseEntity.ok(tournamentService.updateTournament(id, tournament));
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateTournamentFields(
+            @PathVariable Long id,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) Integer maxParticipants,
+             @RequestParam(required = false) String location,
+            @RequestParam(required = false) Float minLevel,
+            @RequestParam(required = false) Float maxLevel,
+            @RequestParam(required = false) Integer cost) {
+
+        Tournament updatedTournament = tournamentService.updateTournamentParams(
+                id, description, startDate, endDate, startTime,
+                category, maxParticipants, location, minLevel, maxLevel, cost
+        );
+        return ResponseEntity.ok(updatedTournament);
     }
 
     @PostMapping
