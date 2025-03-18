@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface CoachRepository extends JpaRepository<Coach, Long> {
     List<Coach> findByEnabledOrderByCostAsc(Boolean enabled);
-    Page<Coach> findAllBy(Pageable pageable);
+    Page<Coach> findAllByEnabled(Pageable pageable, Boolean enabled);
 }

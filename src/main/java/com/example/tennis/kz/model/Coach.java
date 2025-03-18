@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -33,7 +35,11 @@ public class Coach {
     private Boolean enabled;
     @Enumerated(EnumType.STRING)
     private City city;
-    private String language;
+
+    @ElementCollection
+    @CollectionTable(name = "coach_languages", joinColumns = @JoinColumn(name = "coach_id"))
+    @Column(name = "language")
+    private Set<Language> languages;
     private Float cost;
     private String service;
     private String description;

@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -55,6 +56,9 @@ public class Tournament {
     private float minLevel;
     private float maxLevel;
     private int cost;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
     @JsonIgnore
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TournamentRegistration> registrations = new ArrayList<>();

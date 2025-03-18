@@ -1,9 +1,15 @@
 package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.City;
+import com.example.tennis.kz.model.Coach;
 import com.example.tennis.kz.model.Partner;
+import com.example.tennis.kz.model.response.CustomPageResponse;
 import com.example.tennis.kz.service.PartnerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +31,15 @@ public class PartnerController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<?> findAllPartner(@RequestParam(defaultValue = "0") int page){
-        return ResponseEntity.ok(partnerService.getPartners(page));
+    public ResponseEntity<?> findAllPartner(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size,
+                                            @RequestParam Boolean enabled) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+
+        Page<Partner> partners = partnerService.getPartners(pageable, enabled);
+        return ResponseEntity.ok(new CustomPageResponse<>(partners.getNumber() + 1, partners.getSize(), partners.getTotalElements(), partners.getContent()));
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findPartner(@PathVariable Long id) {
         return ResponseEntity.ok(partnerService.getPartnerById(id));

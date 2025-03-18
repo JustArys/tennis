@@ -2,16 +2,19 @@ package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.Category;
 import com.example.tennis.kz.model.Tournament;
+import com.example.tennis.kz.model.response.CustomPageResponse;
 import com.example.tennis.kz.service.TournamentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tournament")
@@ -65,8 +68,13 @@ public class TournamentController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<?> findTournamentByPage(@RequestParam(defaultValue = "0") int page) {
-        return ResponseEntity.ok(tournamentService.findAllTournaments(page));
+    public ResponseEntity<?> findTournamentByPage(@RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+
+        Page<Tournament> tournaments = tournamentService.findAllTournaments(pageable);
+        return ResponseEntity.ok(new CustomPageResponse<>(tournaments.getNumber() + 1, tournaments.getSize(), tournaments.getTotalElements(), tournaments.getContent()));
+
     }
 
     @DeleteMapping("/{id}")

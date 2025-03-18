@@ -31,10 +31,10 @@ public class PartnerService {
         return partnerRepository.findAll();
     }
 
-    public Page<Partner> getPartners(int page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        return partnerRepository.findAll(pageable);
+    public Page<Partner> getPartners(Pageable pageable, Boolean enabled) {
+        return partnerRepository.findAllByEnabled(enabled, pageable);
     }
+
     public Partner enablePartner(Long id) {
         Partner partner = getPartnerById(id);
         partner.setEnabled(true);

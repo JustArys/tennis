@@ -12,4 +12,6 @@ import java.util.List;
 public interface PartnerRepository extends JpaRepository<Partner, Long> {
     List<Partner> findByEnabled(boolean enabled);
     Page<Partner> findAllBy(Pageable pageable);
+
+    Page<Partner> findAllByEnabled(Boolean enabled, Pageable pageable);
 }

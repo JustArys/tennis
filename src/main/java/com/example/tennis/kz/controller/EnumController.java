@@ -1,8 +1,6 @@
 package com.example.tennis.kz.controller;
 
-import com.example.tennis.kz.model.Category;
-import com.example.tennis.kz.model.City;
-import com.example.tennis.kz.model.Role;
+import com.example.tennis.kz.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,5 +26,15 @@ public class EnumController {
     @GetMapping("/category")
     public ResponseEntity<?> getAllCategories() {
         return ResponseEntity.ok(Arrays.asList(Category.values()));
+    }
+
+    @GetMapping("/language")
+    public ResponseEntity<?> getAllLanguages() {
+        return ResponseEntity.ok(Arrays.asList(Language.values()));
+    }
+
+    @GetMapping("/gender")
+    public ResponseEntity<?> getAllGenders() {
+        return ResponseEntity.ok(Arrays.asList(Gender.values()));
     }
 }

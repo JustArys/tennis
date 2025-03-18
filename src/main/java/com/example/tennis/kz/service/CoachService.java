@@ -2,6 +2,7 @@ package com.example.tennis.kz.service;
 
 import com.example.tennis.kz.model.City;
 import com.example.tennis.kz.model.Coach;
+import com.example.tennis.kz.model.Language;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.request.CoachRequest;
 import com.example.tennis.kz.repository.CoachRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +34,8 @@ public class CoachService {
     public List<Coach> getAllCoaches() {
         return coachRepository.findAll();
     }
-    public Page<Coach> getAllCoaches(int page){
-        Pageable pageable = PageRequest.of(page, 10);
-        return coachRepository.findAll(pageable);
+    public Page<Coach> getAllCoaches(Pageable pageable, Boolean enabled) {
+        return coachRepository.findAllByEnabled(pageable, enabled);
     }
     public Coach enableCoach(Long id){
         Coach coach = getCoachById(id);
@@ -46,7 +47,7 @@ public class CoachService {
         var newCoach = Coach.builder()
                 .enabled(false)
                 .city(coach.getCity())
-                .language(coach.getLanguage())
+                .languages(coach.getLanguage())
                 .cost(coach.getCost())
                 .service(coach.getService())
                 .description(coach.getDescription())
@@ -60,7 +61,7 @@ public class CoachService {
 
     public Coach updateCoachParams(Long id,
                                    City city,
-                                   String language,
+                                   Set<Language> languages,
                                    Float cost,
                                    String service,
                                    String description,
@@ -72,8 +73,8 @@ public class CoachService {
         if (city != null) {
             coach.setCity(city);
         }
-        if (language != null) {
-            coach.setLanguage(language);
+        if (languages != null) {
+            coach.setLanguages(languages);
         }
         if (cost != null) {
             coach.setCost(cost);

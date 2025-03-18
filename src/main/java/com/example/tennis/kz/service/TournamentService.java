@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -28,12 +29,12 @@ public class TournamentService {
                 .orElseThrow(() -> new NoSuchElementException("No tournament found with id " + id));
     }
 
-    public Page<Tournament> findAllTournaments(int page) {
-        Pageable pageable = PageRequest.of(page,10);
+    public Page<Tournament> findAllTournaments(Pageable pageable) {
         return tournamentRepository.findAll(pageable);
     }
 
     public Tournament createTournament(Tournament tournament) {
+        tournament.setCreatedAt(LocalDateTime.now());
         return tournamentRepository.save(tournament);
     }
 

@@ -1,10 +1,13 @@
 package com.example.tennis.kz.model.request;
 
 import com.example.tennis.kz.model.City;
+import com.example.tennis.kz.model.Language;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Data
 @Builder
@@ -12,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CoachRequest {
     private City city;
-    private String language;
+    private Set<Language> language;
     private Float cost;
     private String service;
     private String description;

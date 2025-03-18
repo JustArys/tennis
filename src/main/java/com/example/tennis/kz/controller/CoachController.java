@@ -2,12 +2,20 @@ package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.City;
 import com.example.tennis.kz.model.Coach;
+import com.example.tennis.kz.model.Language;
 import com.example.tennis.kz.model.request.CoachRequest;
+import com.example.tennis.kz.model.response.CustomPageResponse;
 import com.example.tennis.kz.service.CoachService;
 import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/coach")
@@ -28,8 +36,13 @@ public class CoachController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<?> findAllCoaches(@RequestParam(defaultValue = "0") int page){
-        return ResponseEntity.ok(coachService.getAllCoaches(page));
+    public ResponseEntity<?> findAllCoaches(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size,
+                                            @RequestParam Boolean enabled) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+
+        Page<Coach> coaches = coachService.getAllCoaches(pageable, enabled);
+        return ResponseEntity.ok(new CustomPageResponse<Coach>(coaches.getNumber() + 1, coaches.getSize(), coaches.getTotalElements(), coaches.getContent()));
     }
 
     @GetMapping("/{id}")
@@ -51,7 +64,7 @@ public class CoachController {
     public ResponseEntity<?> updateCoach(
             @PathVariable Long id,
             @RequestParam(required = false) City city,
-            @RequestParam(required = false) String language,
+            @RequestParam(required = false) Set<Language> language,
             @RequestParam(required = false) Float cost,
             @RequestParam(required = false) String service,
             @RequestParam(required = false) String description,
