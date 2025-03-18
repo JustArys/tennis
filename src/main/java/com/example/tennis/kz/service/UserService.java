@@ -37,9 +37,28 @@ public class UserService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public User updateUser(UserInfo userInfo, User user) {
-        userInfo.setId(user.getId());
-        user.setUserInfo(userInfo);
+    public User updateUser(User user, Gender gender, String firstName, String lastName, String phone, Float rating, Integer age) {
+        UserInfo userInfo = user.getUserInfo();
+
+        if (gender != null) {
+            userInfo.setGender(gender);
+        }
+        if (firstName != null) {
+            userInfo.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            userInfo.setLastName(lastName);
+        }
+        if (phone != null) {
+            userInfo.setPhone(phone);
+        }
+        if (rating != null) {
+            userInfo.setRating(rating);
+        }
+        if (age != null) {
+            userInfo.setAge(age);
+        }
+
         userRepository.save(user);
         return user;
     }

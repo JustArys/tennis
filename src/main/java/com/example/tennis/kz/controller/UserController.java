@@ -1,5 +1,6 @@
 package com.example.tennis.kz.controller;
 
+import com.example.tennis.kz.model.Gender;
 import com.example.tennis.kz.model.Role;
 import com.example.tennis.kz.model.UserInfo;
 import com.example.tennis.kz.service.TournamentRegistrationService;
@@ -19,8 +20,13 @@ public class UserController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody UserInfo userInfo) {
-        var user = userService.updateUser(userInfo, userService.getAuthenticatedUser());
+    public ResponseEntity<?> updateUser(@RequestParam(required = false) Gender gender,
+    @RequestParam(required = false) String firstName,
+    @RequestParam(required = false) String lastName,
+    @RequestParam(required = false) String phone,
+    @RequestParam(required = false) Float rating,
+    @RequestParam(required = false) Integer age) {
+        var user = userService.updateUser(userService.getAuthenticatedUser(), gender, firstName, lastName, phone, rating, age);
         return ResponseEntity.ok(user);
     }
     @GetMapping("/authenticated")
@@ -71,6 +77,5 @@ public class UserController {
                     .body("Failed to delete users: " + e.getMessage());
         }
     }
-
 
 }
