@@ -36,10 +36,10 @@ public class CoachController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<?> findAllCoaches(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> findAllCoaches(@RequestParam(defaultValue = "1") int page,
                                             @RequestParam(defaultValue = "10") int size,
                                             @RequestParam Boolean enabled) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Order.desc("createdAt")));
 
         Page<Coach> coaches = coachService.getAllCoaches(pageable, enabled);
         return ResponseEntity.ok(new CustomPageResponse<Coach>(coaches.getNumber() + 1, coaches.getSize(), coaches.getTotalElements(), coaches.getContent()));

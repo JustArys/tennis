@@ -68,9 +68,9 @@ public class TournamentController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<?> findTournamentByPage(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> findTournamentByPage(@RequestParam(defaultValue = "1") int page,
                                                   @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Order.desc("createdAt")));
 
         Page<Tournament> tournaments = tournamentService.findAllTournaments(pageable);
         return ResponseEntity.ok(new CustomPageResponse<>(tournaments.getNumber() + 1, tournaments.getSize(), tournaments.getTotalElements(), tournaments.getContent()));

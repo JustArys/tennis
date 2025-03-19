@@ -31,10 +31,10 @@ public class PartnerController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<?> findAllPartner(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> findAllPartner(@RequestParam(defaultValue = "1") int page,
                                             @RequestParam(defaultValue = "10") int size,
                                             @RequestParam Boolean enabled) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Order.desc("createdAt")));
 
         Page<Partner> partners = partnerService.getPartners(pageable, enabled);
         return ResponseEntity.ok(new CustomPageResponse<>(partners.getNumber() + 1, partners.getSize(), partners.getTotalElements(), partners.getContent()));
