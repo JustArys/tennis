@@ -33,8 +33,8 @@ public class TournamentService {
         return tournamentRepository.findAll(pageable);
     }
 
-    public Tournament createTournament(Tournament tournament) {
-        tournament.setCreatedAt(LocalDateTime.now());
+    public Tournament createTournament(Tournament tournament, User user) {
+        tournament.setAuthor(user);
         return tournamentRepository.save(tournament);
     }
 

@@ -71,6 +71,7 @@ public class Tournament {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User author;
+
     @JsonIgnore
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TournamentRegistration> registrations = new ArrayList<>();

@@ -2,8 +2,10 @@ package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.Category;
 import com.example.tennis.kz.model.Tournament;
+import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.response.CustomPageResponse;
 import com.example.tennis.kz.service.TournamentService;
+import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import java.time.LocalTime;
 public class TournamentController {
 
     private final TournamentService tournamentService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<?> getAllTournaments() {
@@ -59,7 +62,8 @@ public class TournamentController {
 
     @PostMapping
     public Tournament createTournament(@RequestBody Tournament tournament) {
-        return tournamentService.createTournament(tournament);
+        User user = userService.getAuthenticatedUser();
+        return tournamentService.createTournament(tournament, user);
     }
 
     @GetMapping("/{id}/participants")
