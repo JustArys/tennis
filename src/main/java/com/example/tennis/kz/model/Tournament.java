@@ -29,7 +29,7 @@ public class Tournament {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @Column(name = "tournament_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String description;
@@ -69,7 +69,9 @@ public class Tournament {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ManyToOne(fetch = FetchType.EAGER)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)    // <<< Управляет отображением в Swagger
     private User author;
 
     @JsonIgnore

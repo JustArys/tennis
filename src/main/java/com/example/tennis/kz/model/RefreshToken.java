@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "Refresh_token")
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @MapsId

@@ -24,7 +24,7 @@ public class Coach {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @Column(name = "coach_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
