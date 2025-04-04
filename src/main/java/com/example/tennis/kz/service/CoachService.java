@@ -49,12 +49,11 @@ public class CoachService {
                 .city(coach.getCity())
                 .languages(coach.getLanguage())
                 .cost(coach.getCost())
-                .service(coach.getService())
+                .services(coach.getCoachServices())
                 .description(coach.getDescription())
                 .experience(coach.getExperience())
                 .stadium(coach.getStadium())
                 .user(user.getUserInfo())
-                .createdAt(LocalDateTime.now())
                 .build();
         return coachRepository.save(newCoach);
     }
@@ -63,7 +62,7 @@ public class CoachService {
                                    City city,
                                    Set<Language> languages,
                                    Float cost,
-                                   String service,
+                                   Set<com.example.tennis.kz.model.CoachService> coachServices,
                                    String description,
                                    Integer experience,
                                    String stadium) {
@@ -79,8 +78,8 @@ public class CoachService {
         if (cost != null) {
             coach.setCost(cost);
         }
-        if (service != null) {
-            coach.setService(service);
+        if (coachServices != null) {
+            coach.setServices(coachServices);
         }
         if (description != null) {
             coach.setDescription(description);
@@ -91,8 +90,6 @@ public class CoachService {
         if (stadium != null) {
             coach.setStadium(stadium);
         }
-        coach.setUpdatedAt(LocalDateTime.now());
-
         return coachRepository.save(coach);
     }
 

@@ -1,6 +1,7 @@
 package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.*;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/enum")
 public class EnumController {
+    private final ResourceLoader resourceLoader;
+
+    public EnumController(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
     @GetMapping("/city")
     public ResponseEntity<?> getAllCities() {
         List<City> cities = Arrays.asList(City.values());
@@ -37,4 +44,10 @@ public class EnumController {
     public ResponseEntity<?> getAllGenders() {
         return ResponseEntity.ok(Arrays.asList(Gender.values()));
     }
+
+    @GetMapping("/service")
+    public ResponseEntity<?> getAllServices() {
+        return ResponseEntity.ok(Arrays.asList(CoachService.GET_ALL_SERVICES));
+    }
+
 }

@@ -66,7 +66,7 @@ public class CoachController {
             @RequestParam(required = false) City city,
             @RequestParam(required = false) Set<Language> language,
             @RequestParam(required = false) Float cost,
-            @RequestParam(required = false) String service,
+            @RequestParam(required = false) Set<com.example.tennis.kz.model.CoachService> service,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Integer experience,
             @RequestParam(required = false) String stadium) {
