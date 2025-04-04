@@ -2,10 +2,16 @@ package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.Gender;
 import com.example.tennis.kz.model.Role;
+import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.UserInfo;
+import com.example.tennis.kz.model.response.CustomPageResponse;
 import com.example.tennis.kz.service.TournamentRegistrationService;
 import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,8 +70,12 @@ public class UserController {
     }
 
     @GetMapping("/page")
-    private ResponseEntity<?> getAllUsersPagination(@RequestParam(defaultValue = "0") int page){
-        return ResponseEntity.ok(userService.findAllUsers(page));
+    private ResponseEntity<?> getAllUsersPagination(@RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Order.desc("createdAt")));
+
+        Page<User> users = userService.findAllUsers(pageable);
+        return ResponseEntity.ok(new CustomPageResponse<>(users.getNumber() + 1, users.getSize(), users.getTotalElements(), users.getContent()));
     }
     @DeleteMapping("/all")
     public ResponseEntity<String> deleteAllUsers() {

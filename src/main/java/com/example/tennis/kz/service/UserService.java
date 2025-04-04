@@ -127,9 +127,8 @@ public class UserService {
         return new ArrayList<>(tournaments);
     }
 
-    public Page<User> findAllUsers(int page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        return userRepository.findAll(pageable);
+    public Page<User> findAllUsers(Pageable page) {
+        return userRepository.findAll(page);
     }
 
     @Transactional
