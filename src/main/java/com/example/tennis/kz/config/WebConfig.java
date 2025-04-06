@@ -19,7 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("https://kaz-tennis.netlify.app",
                         "https://localhost",
-                        "http://localhost:8080"
+                        "http://localhost:8080",
+                        "http://localhost:9000/"
                         )
                 .allowedMethods("*")
                 .allowCredentials(true)
