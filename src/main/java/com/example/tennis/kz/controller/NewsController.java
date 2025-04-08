@@ -1,10 +1,15 @@
 package com.example.tennis.kz.controller;
 
 import com.example.tennis.kz.model.News;
+import com.example.tennis.kz.model.response.CustomPageResponse;
 import com.example.tennis.kz.service.NewServices;
 import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,8 +55,12 @@ public class NewsController {
     }
 
     @GetMapping("/allNews")
-    public ResponseEntity<?> getAllNews() {
-        return ResponseEntity.ok(newServices.findAllNews());
+    public ResponseEntity<?> findAllPartner(@RequestParam(defaultValue = "1") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Order.desc("createdAt")));
+        Page<News> news = newServices.findAllNews(pageable);
+        return ResponseEntity.ok(new CustomPageResponse<>(news.getNumber() + 1, news.getSize(), news.getTotalElements(), news.getContent()));
     }
 
     @GetMapping("/{newsId}/image") // Новый эндпоинт для скачивания
@@ -74,5 +83,6 @@ public class NewsController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 
 }

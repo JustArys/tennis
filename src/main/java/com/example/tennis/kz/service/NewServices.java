@@ -5,6 +5,8 @@ import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,8 +49,8 @@ public class NewServices {
         return newsRepository.save(news);
     }
 
-    public List<News> findAllNews() {
-        return newsRepository.findAll();
+    public Page<News> findAllNews(Pageable pageable) {
+        return newsRepository.findAll(pageable);
     }
 
 }
