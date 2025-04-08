@@ -2,12 +2,14 @@ package com.example.tennis.kz.service;
 
 import com.example.tennis.kz.model.News;
 import com.example.tennis.kz.model.User;
+import com.example.tennis.kz.model.response.FileResponse;
 import com.example.tennis.kz.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,8 +23,11 @@ public class NewServices {
     private final NewsRepository newsRepository;
     private final FileService fileService;
 
+    @Transactional
     public News createNews(News news, MultipartFile file) throws IOException {
-        news.setImage(fileService.saveFile(file));
+        FileResponse saveResult = fileService.saveFile(file); // Может выбросить UnsupportedFileTypeException
+        news.setImage(saveResult.getFileName());
+        news.setImageContentType(saveResult.getContentType());
         return newsRepository.save(news);
     }
 

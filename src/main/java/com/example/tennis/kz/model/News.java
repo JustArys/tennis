@@ -51,4 +51,7 @@ public class News {
     private User author;
 
     private String image;
+
+    @Column(name = "image_content_type") // Новое поле
+    private String imageContentType;
 }
