@@ -1,17 +1,5 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres-container
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
-    ports:
-      - "5433:5432"
-    networks:
-      - app-network
-
   app:
     build:
       context: .
@@ -22,9 +10,10 @@ services:
     networks:
       - app-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/mydatabase
-      SPRING_DATASOURCE_USERNAME: myuser
-      SPRING_DATASOURCE_PASSWORD: mypassword
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-cvo1ceuuk2gs73bghp30-a.frankfurt-postgres.render.com:5432/tenniskz
+      SPRING_DATASOURCE_USERNAME: arystanbek
+      SPRING_DATASOURCE_PASSWORD: 31EgyLxhPVWfb8AgxtIDnBbUsRpklNUG
+      FILE_UPLOAD_DIRECTORY: /app/uploads
 
 networks:
   app-network:
