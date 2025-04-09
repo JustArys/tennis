@@ -5,6 +5,7 @@ import com.example.tennis.kz.model.Role;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.UserInfo;
 import com.example.tennis.kz.model.response.CustomPageResponse;
+import com.example.tennis.kz.model.response.UserSearchResultDto;
 import com.example.tennis.kz.service.TournamentRegistrationService;
 import com.example.tennis.kz.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -88,4 +89,31 @@ public class UserController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers(
+            @RequestParam(name = "name") String nameQuery,
+            @RequestParam(defaultValue = "1") int page, // Номер страницы (начиная с 0)
+            @RequestParam(defaultValue = "10") int size) { // Количество результатов на странице
+
+        if (nameQuery.isBlank()) {
+            return ResponseEntity.badRequest().body("Параметр 'name' не может быть пустым.");
+        }
+
+        // Ограничиваем размер страницы для безопасности и производительности
+        int finalSize = Math.min(size, 50); // Например, не больше 50 результатов за раз
+
+        Pageable pageable = PageRequest.of(page-1, finalSize, Sort.by("userInfo.firstName").ascending().and(Sort.by("userInfo.lastName").ascending()));
+
+        Page<UserSearchResultDto> results = userService.searchUsersByName(nameQuery, pageable);
+
+
+        // Или используем твой CustomPageResponse, если он есть
+        CustomPageResponse<UserSearchResultDto> response = new CustomPageResponse<>(
+                results.getNumber() + 1, // +1 если у тебя нумерация с 1
+                results.getSize(),
+                results.getTotalElements(),
+                results.getContent()
+        );
+        return ResponseEntity.ok(response);
+    }
 }

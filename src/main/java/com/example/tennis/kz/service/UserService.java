@@ -1,11 +1,13 @@
 package com.example.tennis.kz.service;
 
 import com.example.tennis.kz.model.*;
+import com.example.tennis.kz.model.response.UserSearchResultDto;
 import com.example.tennis.kz.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.NonUniqueObjectException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -129,6 +132,31 @@ public class UserService {
 
     public Page<User> findAllUsers(Pageable page) {
         return userRepository.findAll(page);
+    }
+
+    public Page<UserSearchResultDto> searchUsersByName(String nameQuery, Pageable pageable) {
+        if (nameQuery == null || nameQuery.isBlank()) {
+            // Если запрос пустой, возвращаем пустую страницу
+            return Page.empty(pageable);
+        }
+        // Вызываем метод репозитория
+        Page<User> userPage = userRepository.searchByFirstNameOrLastNameStartsWith(nameQuery.trim(), pageable);
+
+        // Конвертируем Page<User> в Page<UserSearchResultDto>
+        List<UserSearchResultDto> dtoList = userPage.getContent().stream()
+                .map(user -> {
+                    UserInfo info = user.getUserInfo(); // Получаем UserInfo
+                    return UserSearchResultDto.builder()
+                            .id(user.getId())
+                            .firstName(info != null ? info.getFirstName() : null) // Проверяем info на null
+                            .lastName(info != null ? info.getLastName() : null)
+                            .rating(info != null ? info.getRating() : null)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        // Создаем и возвращаем страницу с DTO
+        return new PageImpl<>(dtoList, pageable, userPage.getTotalElements());
     }
 
     @Transactional
