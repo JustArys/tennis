@@ -86,4 +86,17 @@ public class TournamentController {
         tournamentService.deleteTournament(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterTournaments(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) Float minLevel,
+            @RequestParam(required = false) Float maxLevel,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(tournamentService.filterTournaments(location, category, minLevel, maxLevel, startDate, endDate));
+    }
+
 }
