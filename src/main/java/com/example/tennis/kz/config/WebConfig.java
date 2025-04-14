@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://localhost",
                         "https://kaz-travel.netlify.app",
                         "http://localhost:8080",
-                        "http://localhost:9000/"
+                        "http://localhost:9000"
                         )
                 .allowedMethods("*")
                 .allowCredentials(true)
