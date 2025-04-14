@@ -10,10 +10,41 @@ services:
     networks:
       - app-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-cvo1ceuuk2gs73bghp30-a.frankfurt-postgres.render.com:5432/tenniskz
-      SPRING_DATASOURCE_USERNAME: arystanbek
-      SPRING_DATASOURCE_PASSWORD: 31EgyLxhPVWfb8AgxtIDnBbUsRpklNUG
+      # --- Ссылки на переменные из .env файла ---
+
+      # Database Configuration
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
+      # AWS S3 / R2 Configuration
+      AWS_S3_ENDPOINT: ${AWS_S3_ENDPOINT}
+      AWS_S3_ACCESS_KEY_ID: ${AWS_S3_ACCESS_KEY_ID}
+      AWS_S3_SECRET_ACCESS_KEY: ${AWS_S3_SECRET_ACCESS_KEY}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+      # AWS_S3_REGION: ${AWS_S3_REGION:-auto} # Пример с значением по умолчанию 'auto'
+
+      # Security Token Key
+      TOKEN_SIGNING_KEY: ${TOKEN_SIGNING_KEY}
+
+      # Mail Configuration
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+
+      # --- Переменные, оставшиеся в docker-compose ---
+
+      # File Upload Directory (оставлено здесь, как в оригинале)
       FILE_UPLOAD_DIRECTORY: /app/uploads
+
+      # --- Добавьте сюда другие необходимые переменные окружения ---
+      # Например:
+      # SPRING_PROFILES_ACTIVE: prod
+      # SERVER_PORT: 8000 # Уже задано в ports, но можно и здесь для Spring
+
+    # Опционально: для автоматической перезагрузки при изменениях в коде (во время разработки)
+    # volumes:
+    #   - .:/app
+    # command: ./mvnw spring-boot:run # Или gradlew bootRun
 
 networks:
   app-network:
