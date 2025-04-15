@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import specification.TournamentSpecification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -124,5 +126,19 @@ public class TournamentService {
         tournamentRepository.delete(tournament);
     }
 
+
+    public List<Tournament> filterTournaments(String location, Category category,
+                                              Float minLevel, Float maxLevel,
+                                              LocalDate startDate, LocalDate endDate) {
+
+        Specification<Tournament> spec = Specification
+                .where(TournamentSpecification.hasLocation(location))
+                .and(TournamentSpecification.hasCategory(category))
+                .and(TournamentSpecification.hasMinLevel(minLevel))
+                .and(TournamentSpecification.hasMaxLevel(maxLevel))
+                .and(TournamentSpecification.isBetweenDates(startDate, endDate));
+
+        return tournamentRepository.findAll(spec);
+    }
 
 }
