@@ -27,4 +27,8 @@ public interface TournamentRegistrationRepository extends JpaRepository<Tourname
             @Param("tId") Long tournamentId,
             @Param("uId") Long userId
     );
+
+    List<TournamentRegistration> findByTournamentId(Long tournamentId);
+
+    boolean existsByTournamentId(Long id);
 }

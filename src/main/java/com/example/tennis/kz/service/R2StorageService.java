@@ -37,7 +37,6 @@ public class R2StorageService {
                 .build();
 
         try (InputStream inputStream = file.getInputStream()) {
-            // Используем RequestBody.fromInputStream для потоковой загрузки
             s3Client.putObject(putObjectRequest,
                     RequestBody.fromInputStream(inputStream, file.getSize()));
             return key; // Возвращаем ключ (имя) загруженного файла

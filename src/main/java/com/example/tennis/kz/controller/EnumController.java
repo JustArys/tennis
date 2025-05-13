@@ -50,4 +50,9 @@ public class EnumController {
         return ResponseEntity.ok(Arrays.asList(CoachService.GET_ALL_SERVICES));
     }
 
+    @GetMapping("/tier")
+    public ResponseEntity<?> getAllTiers() {
+        return ResponseEntity.ok(Arrays.asList(TournamentTier.values()));
+    }
+
 }
