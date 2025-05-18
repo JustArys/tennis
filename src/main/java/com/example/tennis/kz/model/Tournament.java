@@ -80,10 +80,6 @@ public class Tournament {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private User author;
 
-    @JsonIgnore // Обычно регистрации не нужны при запросе списка турниров
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<TournamentRegistration> registrations = new ArrayList<>();
-
     @JsonIgnore
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("roundNumber ASC, matchNumberInBracket ASC") // Для упорядоченного получения матчей

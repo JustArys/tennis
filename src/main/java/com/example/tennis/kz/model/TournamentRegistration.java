@@ -25,7 +25,7 @@ public class TournamentRegistration {
     @JoinColumn(name = "partner_id") // Nullable для одиночных турниров
     private User partner;
 
-    @ManyToOne(fetch = FetchType.LAZY) // LAZY, т.к. турнир может быть большим объектом
+    @ManyToOne(fetch = FetchType.EAGER) // LAZY, т.к. турнир может быть большим объектом
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 

@@ -6,6 +6,7 @@ import com.example.tennis.kz.repository.TournamentRegistrationRepository;
 import com.example.tennis.kz.repository.TournamentRepository;
 import com.example.tennis.kz.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +65,7 @@ public class TournamentRegistrationService {
             // 2) Проверка свободных мест (нужно 1 место)
             int participantsNow = getCurrentParticipantCount(tournament.getId(), category);
             if (participantsNow + 1 > tournament.getMaxParticipants()) {
-                throw new RuntimeException("Нет свободных мест в турнире (макс: "
+                throw new IllegalArgumentException("Нет свободных мест в турнире (макс: "
                         + tournament.getMaxParticipants() + ")");
             }
 

@@ -95,13 +95,11 @@ public class PointsService { // Класс вместо интерфейса + �
 
     private void awardPointsToPlayer(User player, int points) {
         if (player == null || player.getUserInfo() == null) {
-            // System.err.println("Warning: Attempted to award points to a null player or player with no UserInfo.");
             return;
         }
         UserInfo userInfo = player.getUserInfo();
-        Float currentRating = userInfo.getRating() != null ? userInfo.getRating() : 0f;
-        userInfo.setRating(currentRating + points);
-        userInfoRepository.save(userInfo); // Убедись, что userInfoRepository инжектирован
-        // System.out.println("Awarded " + points + " points to player ID: " + player.getId() + ". New rating: " + userInfo.getRating());
+        Float currentRating = userInfo.getPoints()!= null ? userInfo.getPoints() : 0f;
+        userInfo.setPoints(currentRating + points);
+        userInfoRepository.save(userInfo);
     }
 }
