@@ -6,6 +6,7 @@ import com.example.tennis.kz.model.Tournament;
 import com.example.tennis.kz.model.User;
 import com.example.tennis.kz.model.request.TournamentCreationRequestDTO;
 import com.example.tennis.kz.model.response.CustomPageResponse;
+import com.example.tennis.kz.model.response.MatchDto;
 import com.example.tennis.kz.service.TournamentQueryService;
 import com.example.tennis.kz.service.TournamentService;
 import com.example.tennis.kz.service.UserService;
@@ -104,9 +105,9 @@ public class TournamentController {
 
     @GetMapping("/{tournamentId}/bracket")
     @Operation(summary = "Get tournament bracket data")
-    public ResponseEntity<List<Match>> getTournamentBracket(@PathVariable Long tournamentId) {
+    public ResponseEntity<?> getTournamentBracket(@PathVariable Long tournamentId) {
         // Здесь тоже лучше возвращать List<MatchDTO>
-        List<Match> bracketData = tournamentQueryService.getTournamentBracket(tournamentId);
+        List<MatchDto> bracketData = tournamentQueryService.getTournamentBracket(tournamentId);
         return ResponseEntity.ok(bracketData);
     }
 }

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum TournamentTier {
-    FUTURES(200, 16, 4),  // Общие очки, Макс. участников, Кол-во сеяных
+    FUTURES(200, 16, 4),
     CHALLENGER(400, 32, 8),
     MASTERS(600, 64, 16);
 
