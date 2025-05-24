@@ -50,7 +50,7 @@ public class UserController {
         return userService.confirmEmail(token);
     }
 
-    @PutMapping("/role")
+    @PatchMapping("/role")
     public ResponseEntity<?> updateRole(@RequestBody Role role) {
         return ResponseEntity.ok(userService.updateUserRole(userService.getAuthenticatedUser(), role));
     }
