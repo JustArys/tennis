@@ -82,6 +82,7 @@ public class Tournament {
     @OrderBy("roundNumber ASC, matchNumberInBracket ASC") // Для упорядоченного получения матчей
     private List<Match> matches = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude // Avoid issues with bidirectional relationships in toString
     @EqualsAndHashCode.Exclude // Avoid issues with bidirectional relationships
