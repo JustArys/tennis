@@ -6,10 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -84,6 +81,11 @@ public class Tournament {
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("roundNumber ASC, matchNumberInBracket ASC") // Для упорядоченного получения матчей
     private List<Match> matches = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude // Avoid issues with bidirectional relationships in toString
+    @EqualsAndHashCode.Exclude // Avoid issues with bidirectional relationships
+    private List<TournamentRegistration> registrations = new ArrayList<>();
 
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
