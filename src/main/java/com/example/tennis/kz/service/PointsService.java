@@ -1,19 +1,21 @@
-package com.example.tennis.kz.service; // или com.example.tennis.kz.service.impl
+package com.example.tennis.kz.service;
 
+import com.example.tennis.kz.exception.BadRequestException; // Импорт
 import com.example.tennis.kz.model.*;
 import com.example.tennis.kz.repository.TournamentRegistrationRepository;
 import com.example.tennis.kz.repository.TournamentRepository;
-import com.example.tennis.kz.repository.UserInfoRepository; // Убедись, что этот репозиторий существует
-import jakarta.persistence.EntityNotFoundException;
+import com.example.tennis.kz.repository.UserInfoRepository;
+// import jakarta.persistence.EntityNotFoundException; // Заменяем
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException; // Импорт
 
 @Service
 @RequiredArgsConstructor
-public class PointsService { // Класс вместо интерфейса + реализации
+public class PointsService {
 
     private final TournamentRepository tournamentRepository;
     private final TournamentRegistrationRepository tournamentRegistrationRepository;
@@ -21,29 +23,37 @@ public class PointsService { // Класс вместо интерфейса + �
 
     @Transactional
     public void calculateAndAwardPointsForTournament(Long tournamentId) {
+        if (tournamentId == null) {
+            throw new BadRequestException("ID турнира не может быть null.");
+        }
         Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + tournamentId));
+                .orElseThrow(() -> new NoSuchElementException("Турнир с ID: " + tournamentId + " не найден."));
 
         Match finalMatch = tournament.getMatches().stream()
                 .filter(m -> m.getRoundNumber() != null && m.getRoundNumber() == tournament.getTotalRounds())
                 .findFirst()
-                .orElse(null);
+                .orElse(null); // Оставляем orElse(null) для явной проверки ниже
 
         if (finalMatch == null || (finalMatch.getStatus() != MatchStatus.COMPLETED && finalMatch.getStatus() != MatchStatus.WALKOVER)) {
-            throw new IllegalStateException("Tournament is not yet finished. Final match not yet completed. Cannot calculate points.");
+            // Если клиент пытается вычислить очки для незавершенного турнира, это некорректный запрос.
+            throw new BadRequestException("Турнир еще не завершен или финальный матч не отмечен как COMPLETED/WALKOVER. Невозможно рассчитать очки.");
         }
 
         List<TournamentRegistration> registrations = tournamentRegistrationRepository.findByTournamentId(tournamentId);
+        if (registrations.isEmpty() && tournament.getTotalRounds() > 0) {
+
+            System.out.println("Нет регистраций для расчета очков в турнире ID: " + tournamentId);
+            return;
+        }
+
         int totalRoundsInTournament = tournament.getTotalRounds();
 
         for (TournamentRegistration reg : registrations) {
-            int roundReached = 0; // Раунд, до которого игрок дошел (т.е. в котором он проиграл или который выиграл, если это финал)
+            int roundReached = 0;
 
-            // Если участник - победитель финального матча
             if (finalMatch.getWinner() != null && finalMatch.getWinner().equals(reg)) {
-                roundReached = totalRoundsInTournament + 1; // Специальное значение для победителя турнира
+                roundReached = totalRoundsInTournament + 1;
             } else {
-                // Ищем максимальный раунд, в котором участник играл
                 int maxRoundPlayedThisParticipant = 0;
                 boolean lostInKnownMatch = false;
 
@@ -52,36 +62,31 @@ public class PointsService { // Класс вместо интерфейса + �
                             (match.getParticipant2() != null && match.getParticipant2().equals(reg));
 
                     if (participatedInThisMatch) {
+                        if (match.getRoundNumber() == null) {
+                            // Это указывает на проблему с данными матча
+                            throw new IllegalStateException("Нарушение целостности данных: номер раунда не установлен для матча ID " + match.getId() + " в турнире " + tournamentId);
+                        }
                         maxRoundPlayedThisParticipant = Math.max(maxRoundPlayedThisParticipant, match.getRoundNumber());
 
-                        // Если это матч, где он проиграл (победитель есть и это не он)
                         if (match.getWinner() != null && !match.getWinner().equals(reg) &&
                                 (match.getStatus() == MatchStatus.COMPLETED || match.getStatus() == MatchStatus.WALKOVER)) {
-                            roundReached = match.getRoundNumber(); // Дошел до этого раунда и проиграл
+                            roundReached = match.getRoundNumber();
                             lostInKnownMatch = true;
                             break;
                         }
                     }
                 }
-                // Если не нашли явного матча проигрыша, но он играл в финале (и не выиграл его, т.к. это проверено выше)
                 if (!lostInKnownMatch && maxRoundPlayedThisParticipant == totalRoundsInTournament) {
-                    roundReached = totalRoundsInTournament; // Значит, финалист (проиграл в финале)
+                    roundReached = totalRoundsInTournament;
                 } else if (!lostInKnownMatch && maxRoundPlayedThisParticipant > 0) {
-                    // Если он играл, но не проиграл ни в одном матче (например, все его последующие соперники снялись)
-                    // Это сложный случай. Для простоты, считаем, что он дошел до максимального раунда, где участвовал.
-                    // Либо, если его последний матч еще не COMPLETED/WALKOVER, но турнир завершен - это ошибка в данных.
                     roundReached = maxRoundPlayedThisParticipant;
                 }
             }
 
-            if (roundReached == 0 && registrations.size() > 1 && tournament.getTotalRounds() > 0) {
-                // System.out.println("Warning: Participant " + reg.getId() + " in tournament " + tournamentId +
-                //                  " seems to have not played or their exit round is unclear. Awarding 0 points by default for this participant.");
-            }
-
+            // Логика для случая, когда roundReached == 0 остается как предупреждение.
+            // Если это критическая ошибка, можно было бы выбросить IllegalStateException.
 
             int pointsAwarded = tournament.getTier().getPointsForRound(roundReached, totalRoundsInTournament);
-            // System.out.println("Tournament " + tournamentId + ": RegID " + reg.getId() + ", RoundReached: " + roundReached + ", Points: " + pointsAwarded);
 
             if (pointsAwarded > 0) {
                 awardPointsToPlayer(reg.getUser(), pointsAwarded);
@@ -90,16 +95,23 @@ public class PointsService { // Класс вместо интерфейса + �
                 }
             }
         }
-        // System.out.println("Points calculation completed for tournament ID: " + tournamentId);
     }
 
     private void awardPointsToPlayer(User player, int points) {
-        if (player == null || player.getUserInfo() == null) {
-            return;
+        if (points <= 0) return; // Не начисляем 0 или отрицательные очки
+
+        if (player == null) {
+            // Это неожиданная ситуация, если логика выше предполагает наличие игрока
+            throw new IllegalStateException("Попытка начислить очки null игроку.");
         }
+        if (player.getUserInfo() == null) {
+            // Также неожиданно, если UserInfo должно всегда существовать для игрока
+            throw new IllegalStateException("Попытка начислить очки игроку (ID: " + player.getId() + ") без UserInfo.");
+        }
+
         UserInfo userInfo = player.getUserInfo();
-        Float currentRating = userInfo.getPoints()!= null ? userInfo.getPoints() : 0f;
-        userInfo.setPoints(currentRating + points);
+        Float currentPoints = userInfo.getPoints() != null ? userInfo.getPoints() : 0f;
+        userInfo.setPoints(currentPoints + points);
         userInfoRepository.save(userInfo);
     }
 }

@@ -17,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
@@ -116,4 +119,30 @@ public class UserController {
         );
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/points-leaderboard") // Descriptive endpoint name
+    public ResponseEntity<?> getUserInfoLeaderboard(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Always sort by "points" in descending order
+        Sort sort = Sort.by(Sort.Order.desc("points"));
+
+        // Adjust page number to be 0-indexed for Spring Data Pageable
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<UserInfo> userInfoPage = userService.getPaginatedUserInfo(pageable);
+
+        // Wrap in your CustomPageResponse
+        CustomPageResponse<UserInfo> response = new CustomPageResponse<>(
+                userInfoPage.getNumber() + 1, // Convert 0-indexed back to 1-indexed for response
+                userInfoPage.getSize(),
+                userInfoPage.getTotalElements(),
+                userInfoPage.getContent()
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }
+

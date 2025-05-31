@@ -1,16 +1,18 @@
-package com.example.tennis.kz.service; // или com.example.tennis.kz.service.impl
+package com.example.tennis.kz.service;
 
+import com.example.tennis.kz.exception.BadRequestException; // Импорт
 import com.example.tennis.kz.model.Match;
 import com.example.tennis.kz.model.MatchStatus;
 import com.example.tennis.kz.model.TournamentRegistration;
 import com.example.tennis.kz.repository.MatchRepository;
 import com.example.tennis.kz.repository.TournamentRegistrationRepository;
-import jakarta.persistence.EntityNotFoundException;
+// import jakarta.persistence.EntityNotFoundException; // Заменяем на NoSuchElementException
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException; // Импорт
 
 @Service
 @RequiredArgsConstructor
@@ -21,22 +23,30 @@ public class MatchService {
 
     @Transactional
     public Match recordResult(Long matchId, Long winnerRegistrationId, String score) {
-        // System.out.println("Recording result for match ID: " + matchId + ", winnerRegID: " + winnerRegistrationId + ", score: " + score);
+        if (matchId == null || winnerRegistrationId == null) {
+            throw new BadRequestException("ID матча и ID победителя не могут быть null.");
+        }
+        if (score == null || score.trim().isEmpty()) {
+            throw new BadRequestException("Счет матча не может быть пустым.");
+        }
+
         Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + matchId));
+                .orElseThrow(() -> new NoSuchElementException("Матч с ID: " + matchId + " не найден."));
 
         if (match.getStatus() == MatchStatus.COMPLETED || match.getStatus() == MatchStatus.WALKOVER) {
-            throw new IllegalStateException("Match already completed or resulted in a walkover.");
+            throw new BadRequestException("Матч уже завершен или закончился техническим поражением.");
         }
         if (match.getParticipant1() == null || match.getParticipant2() == null) {
-            throw new IllegalStateException("Cannot record result, participants not fully set for match.");
+            // Это может также указывать на некорректное состояние сетки, возможно IllegalStateException (ведущий к 500) был бы уместнее,
+            // но если это результат преждевременного запроса клиента, то BadRequestException тоже подходит.
+            throw new BadRequestException("Невозможно записать результат, участники матча определены не полностью.");
         }
 
         TournamentRegistration winnerReg = tournamentRegistrationRepository.findById(winnerRegistrationId)
-                .orElseThrow(() -> new EntityNotFoundException("Winner registration not found with ID: " + winnerRegistrationId));
+                .orElseThrow(() -> new NoSuchElementException("Регистрация победителя с ID: " + winnerRegistrationId + " не найдена."));
 
         if (!winnerReg.equals(match.getParticipant1()) && !winnerReg.equals(match.getParticipant2())) {
-            throw new IllegalArgumentException("Declared winner is not a participant in this match.");
+            throw new BadRequestException("Заявленный победитель не является участником этого матча.");
         }
 
         match.setWinner(winnerReg);
@@ -44,30 +54,33 @@ public class MatchService {
         match.setStatus(MatchStatus.COMPLETED);
         match.setCompletedTime(LocalDateTime.now());
 
-        advanceWinner(match, winnerReg);
+        matchRepository.save(match); // Сохраняем результат матча перед продвижением
+        advanceWinner(match, winnerReg); // Продвигаем победителя
 
-        // System.out.println("Match ID " + matchId + " result recorded successfully.");
-        return matchRepository.save(match);
+        return match; // Возвращаем обновленный матч (уже сохраненный)
     }
 
     @Transactional
     public Match recordWalkover(Long matchId, Long winnerRegistrationId) {
-        // System.out.println("Recording walkover for match ID: " + matchId + ", winnerRegID: " + winnerRegistrationId);
+        if (matchId == null || winnerRegistrationId == null) {
+            throw new BadRequestException("ID матча и ID победителя (по тех. поражению) не могут быть null.");
+        }
+
         Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new EntityNotFoundException("Match not found with ID: " + matchId));
+                .orElseThrow(() -> new NoSuchElementException("Матч с ID: " + matchId + " не найден."));
 
         if (match.getStatus() == MatchStatus.COMPLETED || match.getStatus() == MatchStatus.WALKOVER) {
-            throw new IllegalStateException("Match already completed or resulted in a walkover.");
+            throw new BadRequestException("Матч уже завершен или закончился техническим поражением.");
         }
         if (match.getParticipant1() == null || match.getParticipant2() == null) {
-            throw new IllegalStateException("Cannot record walkover, participants not fully set for match.");
+            throw new BadRequestException("Невозможно записать техническое поражение, участники матча определены не полностью.");
         }
 
         TournamentRegistration winnerReg = tournamentRegistrationRepository.findById(winnerRegistrationId)
-                .orElseThrow(() -> new EntityNotFoundException("Winner registration not found with ID: " + winnerRegistrationId));
+                .orElseThrow(() -> new NoSuchElementException("Регистрация победителя (по тех. поражению) с ID: " + winnerRegistrationId + " не найдена."));
 
         if (!winnerReg.equals(match.getParticipant1()) && !winnerReg.equals(match.getParticipant2())) {
-            throw new IllegalArgumentException("Declared winner (by walkover) is not a participant in this match.");
+            throw new BadRequestException("Заявленный победитель (по тех. поражению) не является участником этого матча.");
         }
 
         match.setWinner(winnerReg);
@@ -75,40 +88,41 @@ public class MatchService {
         match.setStatus(MatchStatus.WALKOVER);
         match.setCompletedTime(LocalDateTime.now());
 
-        advanceWinner(match, winnerReg);
-        // System.out.println("Match ID " + matchId + " walkover recorded successfully.");
-        return matchRepository.save(match);
+        matchRepository.save(match); // Сохраняем результат матча перед продвижением
+        advanceWinner(match, winnerReg); // Продвигаем победителя
+
+        return match; // Возвращаем обновленный матч (уже сохраненный)
     }
 
     private void advanceWinner(Match completedMatch, TournamentRegistration winner) {
         Match nextMatch = completedMatch.getNextMatch();
         if (nextMatch != null) {
-            // System.out.println("Advancing winner of match " + completedMatch.getId() + " to next match " + nextMatch.getId());
-            Match nextMatchEntity = matchRepository.findById(nextMatch.getId()).orElse(null);
-            if(nextMatchEntity == null) {
-                // System.err.println("Error: Next match with ID " + nextMatch.getId() + " not found for completed match " + completedMatch.getId());
-                return; // Это не должно происходить при корректной структуре сетки
-            }
+            // Используем ID для получения актуальной сущности из БД
+            Match nextMatchEntity = matchRepository.findById(nextMatch.getId())
+                    .orElseThrow(() -> new IllegalStateException("Нарушение целостности сетки: следующий матч с ID " + nextMatch.getId() + " не найден для завершенного матча " + completedMatch.getId()));
 
             Integer slot = completedMatch.getNextMatchSlot();
             if (slot == null) {
-                // System.err.println("Error: nextMatchSlot is null for match " + completedMatch.getId());
-                return; // Не можем определить слот
+                throw new IllegalStateException("Нарушение целостности сетки: nextMatchSlot is null для матча " + completedMatch.getId());
             }
 
             if (slot == 1) {
                 nextMatchEntity.setParticipant1(winner);
             } else if (slot == 2) {
                 nextMatchEntity.setParticipant2(winner);
+            } else {
+                // Это не должно произойти, если слот всегда 1 или 2
+                throw new IllegalStateException("Нарушение целостности сетки: некорректный номер слота " + slot + " для матча " + completedMatch.getId());
             }
 
             if (nextMatchEntity.getParticipant1() != null && nextMatchEntity.getParticipant2() != null) {
                 nextMatchEntity.setStatus(MatchStatus.SCHEDULED);
+            } else {
+                // Если только один участник известен, статус остается PENDING_PARTICIPANTS
+                // или можно ввести статус PENDING_OPPONENT
+                nextMatchEntity.setStatus(MatchStatus.PENDING_PARTICIPANTS);
             }
             matchRepository.save(nextMatchEntity);
-            // System.out.println("Winner advanced to slot " + slot + " of match " + nextMatchEntity.getId() + ". Next match status: " + nextMatchEntity.getStatus());
-        } else {
-            // System.out.println("Match " + completedMatch.getId() + " was the final match or next match link is missing. Winner is the tournament champion.");
         }
     }
 }

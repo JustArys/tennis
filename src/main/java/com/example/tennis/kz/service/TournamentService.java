@@ -1,10 +1,11 @@
 package com.example.tennis.kz.service;
 
-import com.example.tennis.kz.model.*; // Все твои модели
+import com.example.tennis.kz.exception.BadRequestException; // Наш кастомный BadRequestException
+import com.example.tennis.kz.model.*;
 import com.example.tennis.kz.model.request.TournamentCreationRequestDTO;
 import com.example.tennis.kz.repository.TournamentRegistrationRepository;
 import com.example.tennis.kz.repository.TournamentRepository;
-import jakarta.persistence.EntityNotFoundException;
+// import jakarta.persistence.EntityNotFoundException; // Заменяем
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays; // Важный импорт для работы с values() у enum
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException; // Стандартный NoSuchElementException
 import java.util.Optional;
-import java.util.stream.Collectors; // Импорт для Collectors.joining
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,21 +29,35 @@ public class TournamentService {
 
     @Transactional
     public Tournament createTournamentFromDto(TournamentCreationRequestDTO dto, User author) {
-        // Валидация DTO должна происходить на уровне контроллера с @Valid
-        // Здесь мы можем добавить дополнительную бизнес-логику, если необходимо
+        if (dto == null) {
+            throw new BadRequestException("Данные для создания турнира (DTO) не могут быть null.");
+        }
+        if (author == null) {
+            throw new BadRequestException("Автор турнира не может быть null.");
+        }
+        // Валидация полей DTO
+        if (dto.getStartDate() == null) throw new BadRequestException("Дата начала турнира должна быть указана.");
+        if (dto.getEndDate() == null) throw new BadRequestException("Дата окончания турнира должна быть указана.");
+        if (dto.getTier() == null) throw new BadRequestException("Уровень (Tier) турнира должен быть указан.");
+        if (dto.getCategory() == null) throw new BadRequestException("Категория турнира должна быть указана.");
+        if (dto.getCity() == null) throw new BadRequestException("Город проведения турнира должен быть указан.");
+        if (dto.getCost() != null && dto.getCost() < 0) throw new BadRequestException("Стоимость участия не может быть отрицательной.");
+        if (dto.getMinLevel() != null && dto.getMinLevel() < 0) throw new BadRequestException("Минимальный уровень не может быть отрицательным.");
+        if (dto.getMaxLevel() != null && dto.getMaxLevel() < 0) throw new BadRequestException("Максимальный уровень не может быть отрицательным.");
+
 
         if (dto.getEndDate().isBefore(dto.getStartDate())) {
-            throw new IllegalArgumentException("End date cannot be before start date.");
+            throw new BadRequestException("Дата окончания турнира не может быть раньше даты начала.");
         }
-        if (dto.getMaxLevel() < dto.getMinLevel()){
-            throw new IllegalArgumentException("Maximum level cannot be less than minimum level.");
+        if (dto.getMaxLevel() != null && dto.getMinLevel() != null && dto.getMaxLevel() < dto.getMinLevel()){
+            throw new BadRequestException("Максимальный уровень не может быть меньше минимального уровня.");
         }
 
         Tournament tournament = new Tournament();
         tournament.setDescription(dto.getDescription());
         tournament.setStartDate(dto.getStartDate());
         tournament.setEndDate(dto.getEndDate());
-        tournament.setStartTime(dto.getStartTime());
+        tournament.setStartTime(dto.getStartTime()); // startTime может быть null, если не указано
         tournament.setTier(dto.getTier());
         tournament.setCategory(dto.getCategory());
         tournament.setLocation(dto.getLocation());
@@ -49,45 +65,58 @@ public class TournamentService {
         tournament.setMinLevel(dto.getMinLevel());
         tournament.setMaxLevel(dto.getMaxLevel());
         tournament.setCost(dto.getCost());
+        tournament.setAuthor(author);
 
-        tournament.setAuthor(author); // Устанавливаем автора
-
-        // id, createdAt, updatedAt будут установлены автоматически
         return tournamentRepository.save(tournament);
     }
-    // --- КОНЕЦ НОВОГО МЕТОДА ---
-
 
     @Transactional
     public Tournament createTournament(Tournament tournament, User author) {
+        if (tournament == null) {
+            throw new BadRequestException("Объект турнира не может быть null.");
+        }
+        if (author == null) {
+            throw new BadRequestException("Автор турнира не может быть null.");
+        }
         if (tournament.getTier() == null) {
-            throw new IllegalArgumentException("Tournament tier must be specified for creation.");
+            throw new BadRequestException("Уровень (Tier) турнира должен быть указан при создании.");
         }
         if (tournament.getCategory() == null) {
-            throw new IllegalArgumentException("Tournament category must be specified for creation.");
+            throw new BadRequestException("Категория турнира должна быть указана при создании.");
         }
-        if (tournament.getId() != null) { // Это важная проверка для метода, принимающего сущность
-            throw new IllegalArgumentException("ID must be null for new tournament creation when passing entity directly.");
+        if (tournament.getId() != null) {
+            throw new BadRequestException("ID должен быть null для создания нового турнира при передаче сущности.");
         }
+        // Дополнительные проверки полей tournament, если они обязательны
+        if (tournament.getStartDate() == null) throw new BadRequestException("Дата начала турнира должна быть указана.");
+        if (tournament.getEndDate() == null) throw new BadRequestException("Дата окончания турнира должна быть указана.");
+        if (tournament.getEndDate().isBefore(tournament.getStartDate())) throw new BadRequestException("Дата окончания не может быть раньше даты начала.");
+        if (tournament.getCity() == null) throw new BadRequestException("Город турнира должен быть указан.");
+
+
         tournament.setAuthor(author);
         return tournamentRepository.save(tournament);
     }
 
     @Transactional(readOnly = true)
     public Tournament getTournamentById(Long id) {
+        if (id == null) {
+            throw new BadRequestException("ID турнира не может быть null.");
+        }
         return tournamentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Турнир с ID: " + id + " не найден."));
     }
 
     @Transactional(readOnly = true)
     public List<Tournament> getAllTournaments() {
-        // Для API, возвращающего ВСЕ турниры, стоит подумать о пагинации по умолчанию
-        // или ограничении, если их может быть очень много.
         return tournamentRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Page<Tournament> findAllTournaments(Pageable pageable) {
+        if (pageable == null) {
+            throw new BadRequestException("Pageable не может быть null.");
+        }
         return tournamentRepository.findAll(pageable);
     }
 
@@ -97,104 +126,95 @@ public class TournamentService {
             Category category, Integer maxParticipantsFromRequest, String location,
             Float minLevel, Float maxLevel, Integer cost) {
 
+        if (id == null) {
+            throw new BadRequestException("ID турнира для обновления не может быть null.");
+        }
         Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + id + " for update."));
+                .orElseThrow(() -> new NoSuchElementException("Турнир с ID: " + id + " не найден для обновления."));
 
-        // Проверка: можно ли изменять критичные параметры (tier, category)
-        // Это важно, так как изменения могут повлиять на уже зарегистрированных участников или сгенерированную сетку.
-        boolean hasRegistrations = tournamentRegistrationRepository.existsByTournamentId(id); // Более эффективный способ проверки
-        boolean bracketGenerated = !tournament.getMatches().isEmpty(); // Предполагаем, что getMatches() не вызовет проблему LAZY здесь, т.к. tournament загружен
+        // Валидация дат, если обе указаны
+        LocalDate effectiveStartDate = (startDate != null) ? startDate : tournament.getStartDate();
+        LocalDate effectiveEndDate = (endDate != null) ? endDate : tournament.getEndDate();
+        if (effectiveEndDate.isBefore(effectiveStartDate)) {
+            throw new BadRequestException("Дата окончания турнира не может быть раньше даты начала.");
+        }
 
-        if (description != null) {
-            tournament.setDescription(description);
+        // Валидация уровней, если оба указаны или один из них обновляется
+        Float effectiveMinLevel = (minLevel != null) ? minLevel : tournament.getMinLevel();
+        Float effectiveMaxLevel = (maxLevel != null) ? maxLevel : tournament.getMaxLevel();
+        if (effectiveMinLevel != null && effectiveMaxLevel != null && effectiveMaxLevel < effectiveMinLevel) {
+            throw new BadRequestException("Максимальный уровень не может быть меньше минимального.");
         }
-        if (startDate != null) {
-            // Можно добавить валидацию дат (startDate <= endDate)
-            tournament.setStartDate(startDate);
+        if (cost != null && cost < 0) {
+            throw new BadRequestException("Стоимость участия не может быть отрицательной.");
         }
-        if (endDate != null) {
-            tournament.setEndDate(endDate);
-        }
-        if (startTime != null) {
-            tournament.setStartTime(startTime);
-        }
-        if (location != null) {
-            tournament.setLocation(location);
-        }
-        if (minLevel != null) {
-            // Валидация: minLevel <= maxLevel
-            tournament.setMinLevel(minLevel);
-        }
-        if (maxLevel != null) {
-            tournament.setMaxLevel(maxLevel);
-        }
-        if (cost != null) {
-            // Валидация: cost >= 0
-            tournament.setCost(cost);
-        }
+
+
+        boolean hasRegistrations = tournamentRegistrationRepository.existsByTournamentId(id);
+        boolean bracketGenerated = !tournament.getMatches().isEmpty();
+
+        if (description != null) tournament.setDescription(description);
+        if (startDate != null) tournament.setStartDate(startDate);
+        if (endDate != null) tournament.setEndDate(endDate);
+        if (startTime != null) tournament.setStartTime(startTime);
+        if (location != null) tournament.setLocation(location);
+        if (minLevel != null) tournament.setMinLevel(minLevel);
+        if (maxLevel != null) tournament.setMaxLevel(maxLevel);
+        if (cost != null) tournament.setCost(cost);
+
 
         if (category != null && !category.equals(tournament.getCategory())) {
             if (hasRegistrations || bracketGenerated) {
-                throw new IllegalStateException("Cannot change category for a tournament with existing registrations or a generated bracket. Tournament ID: " + id);
+                throw new BadRequestException("Нельзя изменять категорию для турнира ID: " + id + " с существующими регистрациями или сгенерированной сеткой.");
             }
             tournament.setCategory(category);
         }
 
         if (maxParticipantsFromRequest != null) {
-            if (hasRegistrations || bracketGenerated) {
-                throw new IllegalStateException("Cannot change tier (via maxParticipants) for a tournament with existing registrations or a generated bracket. Tournament ID: " + id);
-            }
-
             Optional<TournamentTier> foundTier = Arrays.stream(TournamentTier.values())
                     .filter(t -> t.getMaxParticipants() == maxParticipantsFromRequest)
                     .findFirst();
 
             if (foundTier.isPresent()) {
-                if (!foundTier.get().equals(tournament.getTier())) { // Обновляем только если tier действительно изменился
+                if (!foundTier.get().equals(tournament.getTier())) {
+                    if (hasRegistrations || bracketGenerated) {
+                        throw new BadRequestException("Нельзя изменять уровень (Tier) для турнира ID: " + id + " с существующими регистрациями или сгенерированной сеткой.");
+                    }
                     tournament.setTier(foundTier.get());
                 }
             } else {
                 String validParticipantCounts = Arrays.stream(TournamentTier.values())
                         .map(t -> String.valueOf(t.getMaxParticipants()))
                         .collect(Collectors.joining(", "));
-                throw new IllegalArgumentException("No TournamentTier found for maxParticipants: " + maxParticipantsFromRequest +
-                        ". Valid participant counts are: [" + validParticipantCounts + "].");
+                throw new BadRequestException("Не найден TournamentTier для maxParticipants: " + maxParticipantsFromRequest +
+                        ". Допустимые значения: [" + validParticipantCounts + "].");
             }
         }
-        // updatedAt будет обновлен Hibernate автоматически
-
         return tournamentRepository.save(tournament);
     }
 
     @Transactional
     public void deleteTournament(Long id) {
-        Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tournament not found with ID: " + id + " for deletion."));
-
-        // Дополнительные бизнес-правила перед удалением:
-        // Например, если турнир уже начался или есть регистрации, возможно, удаление должно быть "мягким"
-        // или должно быть запрещено. Текущая реализация просто удаляет.
-        // Каскадное удаление регистраций и матчей настроено в Tournament entity.
-        tournamentRepository.delete(tournament);
+        if (id == null) {
+            throw new BadRequestException("ID турнира для удаления не может быть null.");
+        }
+        // Проверка существования перед удалением, чтобы вернуть 404, если не найден
+        if (!tournamentRepository.existsById(id)) {
+            throw new NoSuchElementException("Турнир с ID: " + id + " не найден для удаления.");
+        }
+        // Дополнительные бизнес-правила (например, запрет удаления активных турниров) могут быть здесь.
+        // Каскадное удаление настроено в Tournament entity.
+        tournamentRepository.deleteById(id); // Используем deleteById для эффективности, т.к. сущность уже проверена
     }
 
     @Transactional(readOnly = true)
     public List<TournamentRegistration> getAllParticipants(Long tournamentId) {
-        if (!tournamentRepository.existsById(tournamentId)) {
-            throw new EntityNotFoundException("Tournament not found with ID: " + tournamentId + " when fetching participants.");
+        if (tournamentId == null) {
+            throw new BadRequestException("ID турнира не может быть null для получения участников.");
         }
-        List<TournamentRegistration> registrations = tournamentRegistrationRepository.findByTournamentId(tournamentId);
-
-        // Замечание опытного разработчика:
-        // Если сущности User и UserInfo внутри TournamentRegistration мапятся с FetchType.LAZY,
-        // то при доступе к ним вне этого транзакционного метода (например, при сериализации в JSON контроллером)
-        // может возникнуть LazyInitializationException.
-        // Решения:
-        // 1. Использовать DTO и маппить данные в них здесь, внутри транзакции.
-        // 2. Использовать JOIN FETCH в запросе репозитория findByTournamentId, чтобы подгрузить связанные сущности.
-        //    Пример: @Query("SELECT tr FROM TournamentRegistration tr LEFT JOIN FETCH tr.user u LEFT JOIN FETCH u.userInfo WHERE tr.tournament.id = :tournamentId")
-        // 3. Изменить FetchType на EAGER (но это может повлиять на производительность в других местах).
-        // Текущая реализация возвращает список сущностей; дальнейшая обработка LAZY - ответственность вызывающего кода или DTO-маппера.
-        return registrations;
+        if (!tournamentRepository.existsById(tournamentId)) {
+            throw new NoSuchElementException("Турнир с ID: " + tournamentId + " не найден при получении списка участников.");
+        }
+        return tournamentRegistrationRepository.findByTournamentId(tournamentId);
     }
 }
